@@ -49,7 +49,7 @@ jobs:
     - name: Install dependencies (Backend)
       run: |
         cd nanomed-NODEJS-API-v2
-        npm install
+        npm install --legacy-peer-deps
       env:
         NODE_ENV: development
     
@@ -63,7 +63,7 @@ jobs:
     - name: Install dependencies (Frontend)
       run: |
         cd nanomed-v4-react-node-nextjs
-        yarn install
+        yarn install --ignore-engines
       env:
         NODE_ENV: development
     
