@@ -98,8 +98,8 @@ HOST=0.0.0.0
 
 # Database Configuration
 DB_SERVER=db
-DB_USER=sa
-DB_PASSWORD=YourStrong@Passw0rd
+DB_USER=${DB_USER:-sa}
+DB_PASSWORD=${DB_PASSWORD:-YourStrong@Passw0rd}
 DB_NAME=nanomed
 DB_PORT=1433
 
