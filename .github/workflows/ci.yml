@@ -49,7 +49,7 @@ jobs:
     - name: Install dependencies (Backend)
       run: |
         cd nanomed-NODEJS-API-v2
-        npm ci
+        npm install
       env:
         NODE_ENV: development
     
@@ -63,7 +63,7 @@ jobs:
     - name: Install dependencies (Frontend)
       run: |
         cd nanomed-v4-react-node-nextjs
-        yarn install --frozen-lockfile
+        yarn install
       env:
         NODE_ENV: development
     
