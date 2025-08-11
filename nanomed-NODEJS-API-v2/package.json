@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "test": "echo 'No tests configured yet' && exit 0",
     "migrate": "node src/migrations/001-create-tables.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "sync-db": "node sync-database.js"

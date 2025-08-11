@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test": "echo 'No tests configured yet' && exit 0"
   },
   "config": {
     "legacy-peer-deps": true
