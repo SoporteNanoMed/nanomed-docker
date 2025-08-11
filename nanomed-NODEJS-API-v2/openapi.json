@@ -1,0 +1,2342 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Nanomed API v2",
+    "description": "API REST para el sistema Nanomed - Gestión médica y administrativa integral\n\n## Características Principales\n- 🔐 Autenticación JWT con MFA\n- 👥 Sistema de roles multinivel (Usuario, Médico, Recepcionista, Admin)\n- 🏥 Gestión completa de citas médicas\n- 📅 Sistema de horarios médicos configurables\n- 🔬 Gestión de exámenes médicos\n- 📊 Reportes y estadísticas en tiempo real\n- 🔔 Notificaciones automáticas\n\n## Roles de Usuario\n- **user** - Usuario/Paciente: Gestión personal de citas y exámenes\n- **medico** - Médico: Gestión de pacientes y exámenes médicos\n- **recepcionista** - Recepcionista: Gestión integral de citas y pacientes\n- **admin** - Administrador: Control total del sistema\n\n**NOTA**: Los endpoints de conversaciones/mensajería han sido eliminados del proyecto.\n",
+    "version": "2.2.0",
+    "contact": {
+      "name": "Soporte Nanomed",
+      "email": "soporte@nanomed.cl",
+      "url": "https://nanomed.cl"
+    },
+    "license": {
+      "name": "Privado y Confidencial",
+      "url": "https://nanomed.cl/license"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Servidor de desarrollo"
+    },
+    {
+      "url": "https://nanomed-nodejs-api-v2.azurewebsites.net",
+      "description": "Servidor de producción"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtenido del endpoint de login"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "apellido": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "telefono": {
+            "type": "string"
+          },
+          "rut": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "medico",
+              "recepcionista",
+              "admin"
+            ]
+          },
+          "email_verified": {
+            "type": "boolean"
+          },
+          "genero": {
+            "type": "string",
+            "enum": [
+              "Masculino",
+              "Femenino",
+              "Otro"
+            ]
+          },
+          "direccion": {
+            "type": "string"
+          },
+          "ciudad": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "foto_perfil": {
+            "type": "string"
+          },
+          "creado_en": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "body": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "nombre",
+          "apellido",
+          "email",
+          "password",
+          "rut"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "apellido": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          },
+          "rut": {
+            "type": "string"
+          },
+          "telefono": {
+            "type": "string"
+          },
+          "genero": {
+            "type": "string"
+          },
+          "direccion": {
+            "type": "string"
+          },
+          "ciudad": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "fecha_nacimiento": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Registrar nuevo usuario",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado exitosamente"
+          },
+          "400": {
+            "description": "Error en los datos"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Iniciar sesión",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso"
+          },
+          "401": {
+            "description": "Credenciales inválidas"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Cerrar sesión",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sesión cerrada exitosamente"
+          }
+        }
+      }
+    },
+    "/api/auth/verify-email/{token}": {
+      "get": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Verificar email",
+        "security": [],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email verificado exitosamente"
+          }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Solicitar restablecimiento de contraseña",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Email de restablecimiento enviado"
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Restablecer contraseña",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Contraseña restablecida exitosamente"
+          }
+        }
+      }
+    },
+    "/api/auth/check-password-strength": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Verificar fortaleza de contraseña",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Análisis de fortaleza de contraseña"
+          }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Obtener perfil propio",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil del usuario"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Actualizar perfil propio",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado correctamente"
+          }
+        }
+      }
+    },
+    "/api/users/me/password": {
+      "put": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Cambiar contraseña",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contraseña actualizada"
+          }
+        }
+      }
+    },
+    "/api/users/me/profile-picture": {
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Subir foto de perfil",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profilePhoto": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Foto subida exitosamente"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Eliminar foto de perfil",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Foto eliminada exitosamente"
+          }
+        }
+      }
+    },
+    "/api/users/me/emergency-contacts": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Listar contactos de emergencia",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de contactos de emergencia"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Agregar contacto de emergencia",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Contacto agregado exitosamente"
+          }
+        }
+      }
+    },
+    "/api/users/me/emergency-contacts/{id}": {
+      "put": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Actualizar contacto de emergencia",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contacto actualizado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Eliminar contacto de emergencia",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contacto eliminado"
+          }
+        }
+      }
+    },
+    "/api/users/me/medical-info": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Obtener información médica",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información médica del usuario"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Actualizar información médica",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información médica actualizada"
+          }
+        }
+      }
+    },
+    "/api/doctors": {
+      "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Listar médicos disponibles",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de médicos"
+          }
+        }
+      }
+    },
+    "/api/doctors/{id}": {
+      "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Obtener médico específico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información del médico"
+          }
+        }
+      }
+    },
+    "/api/doctors/specialties/{specialtyId}": {
+      "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Médicos por especialidad",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "specialtyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Médicos de la especialidad"
+          }
+        }
+      }
+    },
+    "/api/doctors/me/appointments": {
+      "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Listar mis citas como médico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de citas del médico"
+          }
+        }
+      }
+    },
+    "/api/doctors/me/appointments/{id}": {
+      "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Obtener detalle de mi cita específica",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de la cita"
+          }
+        }
+      }
+    },
+    "/api/doctors/me/appointments/{id}/status": {
+      "put": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Actualizar estado de mi cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado de cita actualizado"
+          }
+        }
+      }
+    },
+    "/api/appointments": {
+      "get": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Listar citas propias",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de citas del usuario"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Crear nueva cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Cita creada exitosamente"
+          }
+        }
+      }
+    },
+    "/api/appointments/available-slots": {
+      "get": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Obtener horarios disponibles",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "medico_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fecha",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Horarios disponibles"
+          }
+        }
+      }
+    },
+    "/api/appointments/{id}": {
+      "put": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Actualizar cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cita actualizada"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Cancelar cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cita cancelada"
+          }
+        }
+      }
+    },
+    "/api/appointments/{id}/confirm": {
+      "post": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Confirmar asistencia a cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Asistencia confirmada"
+          }
+        }
+      }
+    },
+    "/api/appointments/{id}/reschedule": {
+      "post": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Reprogramar cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nueva_fecha_hora": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cita reprogramada"
+          }
+        }
+      }
+    },
+    "/api/receptionists/appointments": {
+      "get": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Listar todas las citas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de todas las citas"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Crear cita para cualquier paciente",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Cita creada"
+          }
+        }
+      }
+    },
+    "/api/receptionists/appointments/{id}": {
+      "put": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Actualizar cualquier cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cita actualizada"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Cancelar cualquier cita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cita cancelada"
+          }
+        }
+      }
+    },
+    "/api/receptionists/patients": {
+      "get": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Listar todos los pacientes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pacientes"
+          }
+        }
+      }
+    },
+    "/api/receptionists/patients/{id}": {
+      "get": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Información detallada de paciente",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información del paciente"
+          }
+        }
+      }
+    },
+    "/api/receptionists/doctors": {
+      "get": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Listar todos los médicos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de médicos"
+          }
+        }
+      }
+    },
+    "/api/receptionists/doctors/{id}/availability": {
+      "get": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Disponibilidad de médico (legacy)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fecha",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Disponibilidad del médico"
+          }
+        }
+      }
+    },
+    "/api/receptionists/doctors/{id}/availability-updated": {
+      "get": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Disponibilidad actualizada (usando horarios configurados)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fecha",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Disponibilidad basada en horarios configurados"
+          }
+        }
+      }
+    },
+    "/api/receptionists/doctors/{id}/schedule": {
+      "post": {
+        "tags": [
+          "Horarios Médicos"
+        ],
+        "summary": "Establecer horarios regulares del médico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "horarios": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "dia_semana": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6
+                        },
+                        "hora_inicio": {
+                          "type": "string",
+                          "format": "time"
+                        },
+                        "hora_fin": {
+                          "type": "string",
+                          "format": "time"
+                        },
+                        "duracion_cita": {
+                          "type": "integer",
+                          "default": 30
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Horarios establecidos exitosamente"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Horarios Médicos"
+        ],
+        "summary": "Consultar horarios configurados del médico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Horarios configurados del médico"
+          }
+        }
+      }
+    },
+    "/api/receptionists/doctors/{id}/schedule/{scheduleId}": {
+      "put": {
+        "tags": [
+          "Horarios Médicos"
+        ],
+        "summary": "Actualizar horario específico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "scheduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Horario actualizado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Horarios Médicos"
+        ],
+        "summary": "Eliminar horario específico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "scheduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Horario eliminado"
+          }
+        }
+      }
+    },
+    "/api/receptionists/doctors/{id}/schedule/exceptions": {
+      "post": {
+        "tags": [
+          "Horarios Médicos"
+        ],
+        "summary": "Agregar excepción de horario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fecha": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "motivo": {
+                    "type": "string"
+                  },
+                  "todo_el_dia": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "hora_inicio": {
+                    "type": "string",
+                    "format": "time"
+                  },
+                  "hora_fin": {
+                    "type": "string",
+                    "format": "time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Excepción agregada"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Horarios Médicos"
+        ],
+        "summary": "Listar excepciones del médico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fecha_desde",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "fecha_hasta",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de excepciones"
+          }
+        }
+      }
+    },
+    "/api/receptionists/doctors/{id}/schedule/exceptions/{exceptionId}": {
+      "delete": {
+        "tags": [
+          "Horarios Médicos"
+        ],
+        "summary": "Eliminar excepción",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "exceptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excepción eliminada"
+          }
+        }
+      }
+    },
+    "/api/receptionists/stats/daily": {
+      "get": {
+        "tags": [
+          "Recepcionistas"
+        ],
+        "summary": "Estadísticas diarias",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "fecha",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estadísticas del día"
+          }
+        }
+      }
+    },
+    "/api/exams": {
+      "get": {
+        "tags": [
+          "Exámenes"
+        ],
+        "summary": "Listar exámenes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de exámenes"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Exámenes"
+        ],
+        "summary": "Crear nuevo examen",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "archivo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Examen creado"
+          }
+        }
+      }
+    },
+    "/api/exams/{id}": {
+      "get": {
+        "tags": [
+          "Exámenes"
+        ],
+        "summary": "Obtener examen específico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información del examen"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Exámenes"
+        ],
+        "summary": "Actualizar examen",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Examen actualizado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Exámenes"
+        ],
+        "summary": "Eliminar examen",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Examen eliminado"
+          }
+        }
+      }
+    },
+    "/api/exams/{id}/file": {
+      "get": {
+        "tags": [
+          "Exámenes"
+        ],
+        "summary": "Descargar archivo de examen",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo del examen"
+          }
+        }
+      }
+    },
+    "/api/specialties": {
+      "get": {
+        "tags": [
+          "Especialidades"
+        ],
+        "summary": "Listar especialidades médicas",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Lista de especialidades"
+          }
+        }
+      }
+    },
+    "/api/specialties/stats": {
+      "get": {
+        "tags": [
+          "Especialidades"
+        ],
+        "summary": "Estadísticas de especialidades",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Estadísticas de especialidades"
+          }
+        }
+      }
+    },
+    "/api/specialties/{nombre}": {
+      "get": {
+        "tags": [
+          "Especialidades"
+        ],
+        "summary": "Información de especialidad específica",
+        "security": [],
+        "parameters": [
+          {
+            "name": "nombre",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información de la especialidad"
+          }
+        }
+      }
+    },
+    "/api/search/doctors": {
+      "get": {
+        "tags": [
+          "Búsquedas"
+        ],
+        "summary": "Buscar médicos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "especialidad",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "apellido",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados de búsqueda"
+          }
+        }
+      }
+    },
+    "/api/search/exams": {
+      "get": {
+        "tags": [
+          "Búsquedas"
+        ],
+        "summary": "Buscar exámenes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tipo_examen",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fecha_desde",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "fecha_hasta",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados de búsqueda"
+          }
+        }
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "summary": "Listar notificaciones del usuario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "leida",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de notificaciones"
+          }
+        }
+      }
+    },
+    "/api/notifications/{id}/read": {
+      "put": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "summary": "Marcar notificación como leída",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificación marcada como leída"
+          }
+        }
+      }
+    },
+    "/api/notifications/read-all": {
+      "put": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "summary": "Marcar todas las notificaciones como leídas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Todas las notificaciones marcadas como leídas"
+          }
+        }
+      }
+    },
+    "/api/notifications/{id}": {
+      "delete": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "summary": "Eliminar notificación",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificación eliminada"
+          }
+        }
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "summary": "Obtener preferencias de notificación",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preferencias de notificación"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "summary": "Actualizar preferencias de notificación",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email_citas": {
+                    "type": "boolean"
+                  },
+                  "email_resultados": {
+                    "type": "boolean"
+                  },
+                  "email_promociones": {
+                    "type": "boolean"
+                  },
+                  "sms_citas": {
+                    "type": "boolean"
+                  },
+                  "sms_resultados": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferencias actualizadas"
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Listar todos los usuarios",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Ver detalle de usuario específico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle del usuario"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Actualizar datos de usuario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Desactivar usuario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario desactivado"
+          }
+        }
+      }
+    },
+    "/api/admin/users/medico": {
+      "post": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Crear nuevo usuario médico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Médico creado"
+          }
+        }
+      }
+    },
+    "/api/admin/users/recepcionista": {
+      "post": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Crear nuevo recepcionista",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Recepcionista creado"
+          }
+        }
+      }
+    },
+    "/api/admin/users/admin": {
+      "post": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Crear nuevo administrador",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Administrador creado"
+          }
+        }
+      }
+    },
+    "/api/admin/doctors": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Listar todos los médicos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de médicos"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Crear nuevo médico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Médico creado"
+          }
+        }
+      }
+    },
+    "/api/admin/doctors/{id}": {
+      "delete": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Desactivar médico",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Médico desactivado"
+          }
+        }
+      }
+    },
+    "/api/admin/doctors/migration/status": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Estado de migración",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado de migración"
+          }
+        }
+      }
+    },
+    "/api/admin/doctors/migration/execute": {
+      "post": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Ejecutar migración",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migración ejecutada"
+          }
+        }
+      }
+    },
+    "/api/admin/recepcionistas": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Listar recepcionistas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de recepcionistas"
+          }
+        }
+      }
+    },
+    "/api/admin/admin": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Listar administradores",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de administradores"
+          }
+        }
+      }
+    },
+    "/api/admin/stats": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Estadísticas generales del sistema",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estadísticas del sistema"
+          }
+        }
+      }
+    },
+    "/api/admin/logs": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Obtener logs del sistema",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logs del sistema"
+          }
+        }
+      }
+    },
+    "/api/admin/appointments": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Ver todas las citas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de todas las citas"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Sistema",
+      "description": "Endpoints del sistema y estado de la API"
+    },
+    {
+      "name": "Autenticación",
+      "description": "Registro, login y gestión de autenticación"
+    },
+    {
+      "name": "Autenticación MFA",
+      "description": "Autenticación de dos factores (2FA)"
+    },
+    {
+      "name": "Perfil de Usuario",
+      "description": "Gestión del perfil del usuario autenticado"
+    },
+    {
+      "name": "Contactos de Emergencia",
+      "description": "Gestión de contactos de emergencia del usuario"
+    },
+    {
+      "name": "Información Médica",
+      "description": "Gestión de información médica personal"
+    },
+    {
+      "name": "Usuarios (Legacy)",
+      "description": "Gestión legacy de usuarios (compatibilidad)"
+    },
+    {
+      "name": "Médicos",
+      "description": "Consulta de información de médicos disponibles"
+    },
+    {
+      "name": "Especialidades",
+      "description": "Consulta de especialidades médicas"
+    },
+    {
+      "name": "Citas Médicas",
+      "description": "Gestión de citas médicas para usuarios"
+    },
+    {
+      "name": "Recepcionistas",
+      "description": "Funcionalidades específicas para recepcionistas (gestión integral)"
+    },
+    {
+      "name": "Exámenes Médicos",
+      "description": "Gestión completa de exámenes médicos"
+    },
+    {
+      "name": "Conversaciones",
+      "description": "Sistema de mensajería entre usuarios y médicos"
+    },
+    {
+      "name": "Notificaciones",
+      "description": "Gestión de notificaciones y preferencias"
+    },
+    {
+      "name": "Búsqueda",
+      "description": "Funcionalidades de búsqueda avanzada"
+    },
+    {
+      "name": "Administración",
+      "description": "Funcionalidades administrativas del sistema"
+    },
+    {
+      "name": "Notificaciones",
+      "description": "Sistema de notificaciones"
+    },
+    {
+      "name": "Mensajería",
+      "description": "Sistema de mensajería entre pacientes y médicos"
+    },
+    {
+      "name": "Búsqueda",
+      "description": "Búsqueda avanzada de médicos y exámenes"
+    },
+    {
+      "name": "Administración",
+      "description": "Endpoints administrativos (solo para admins)"
+    }
+  ]
+}

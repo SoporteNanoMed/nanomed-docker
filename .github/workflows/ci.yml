@@ -1,0 +1,119 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      # Servicio de base de datos para testing
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: YourStrong@Passw0rd
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -C -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 1433:1433
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies (Backend)
+      run: |
+        cd nanomed-NODEJS-API-v2
+        npm ci
+    
+    - name: Install dependencies (Frontend)
+      run: |
+        cd nanomed-v4-react-node-nextjs
+        npm ci
+    
+    - name: Run tests (Backend)
+      run: |
+        cd nanomed-NODEJS-API-v2
+        npm test
+      env:
+        DB_SERVER: localhost
+        DB_USER: sa
+        DB_PASSWORD: YourStrong@Passw0rd
+        DB_NAME: nanomed
+        DB_PORT: 1433
+        NODE_ENV: test
+    
+    - name: Run tests (Frontend)
+      run: |
+        cd nanomed-v4-react-node-nextjs
+        npm test
+    
+    - name: Build (Frontend)
+      run: |
+        cd nanomed-v4-react-node-nextjs
+        npm run build
+      env:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+        NEXT_PUBLIC_CLIENT_URL: http://localhost:3000
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Build and push Backend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./nanomed-NODEJS-API-v2
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/nanomed-api:latest
+          ${{ secrets.DOCKER_USERNAME }}/nanomed-api:${{ github.sha }}
+    
+    - name: Build and push Frontend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./nanomed-v4-react-node-nextjs
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/nanomed-frontend:latest
+          ${{ secrets.DOCKER_USERNAME }}/nanomed-frontend:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production..."
+        # Aquí irían los comandos de despliegue
+        # Por ejemplo, para Azure, AWS, etc.
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}

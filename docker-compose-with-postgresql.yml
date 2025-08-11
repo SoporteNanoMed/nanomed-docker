@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: nanomed-postgres
+    environment:
+      - POSTGRES_DB=nanomed
+      - POSTGRES_USER=nanomed_user
+      - POSTGRES_PASSWORD=nanomed_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nanomed-network
+    restart: unless-stopped
+
+  # API Node.js con PostgreSQL
+  api:
+    build:
+      context: ./nanomed-NODEJS-API-v2
+      dockerfile: Dockerfile-postgresql
+    container_name: nanomed-api
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - HOST=0.0.0.0
+      - CLIENT_URL=http://localhost:3000
+      # Variables de base de datos PostgreSQL
+      - DB_SERVER=db
+      - DB_USER=nanomed_user
+      - DB_PASSWORD=nanomed_password
+      - DB_NAME=nanomed
+      - DB_PORT=5432
+      # Variables de JWT
+      - JWT_SECRET=your_jwt_secret_here
+      - JWT_EXPIRATION=1h
+      - JWT_REFRESH_EXPIRATION=7d
+      # Variables de email (ajusta según tu configuración)
+      # - EMAIL_SERVICE=gmail
+      # - EMAIL_USER=your_email@gmail.com
+      # - EMAIL_PASSWORD=your_app_password
+      # - EMAIL_FROM=Nanomed <no-reply@nanomed.com>
+      # Variables de Mailgun (opcional)
+      # - MAILGUN_API_KEY=your_mailgun_api_key
+      # - MAILGUN_DOMAIN=your_mailgun_domain
+      # - MAILGUN_FROM=Nanomed <noreply@nanomed.cl>
+      # Rate limiting
+      - RATE_LIMITING_ENABLED=false
+    volumes:
+      - ./nanomed-NODEJS-API-v2:/app
+      - /app/node_modules
+    networks:
+      - nanomed-network
+    depends_on:
+      - db
+      - frontend
+    restart: unless-stopped
+
+  # Frontend Next.js
+  frontend:
+    build:
+      context: ./nanomed-v4-react-node-nextjs
+      dockerfile: Dockerfile
+    container_name: nanomed-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_CLIENT_URL=http://localhost:3000
+    volumes:
+      - ./nanomed-v4-react-node-nextjs:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - nanomed-network
+    restart: unless-stopped
+
+networks:
+  nanomed-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

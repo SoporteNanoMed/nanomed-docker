@@ -1,0 +1,56 @@
+{
+  "name": "nanomed-docker",
+  "version": "1.0.0",
+  "description": "Plataforma médica completa con Docker Compose",
+  "private": true,
+  "workspaces": [
+    "nanomed-NODEJS-API-v2",
+    "nanomed-v4-react-node-nextjs"
+  ],
+  "scripts": {
+    "start": "./dev.sh start",
+    "stop": "./dev.sh stop",
+    "restart": "./dev.sh restart",
+    "logs": "./dev.sh logs",
+    "rebuild": "./dev.sh rebuild",
+    "db": "./dev.sh db",
+    "sync-db": "./dev.sh sync-db",
+    "status": "./dev.sh status",
+    "dev": "./dev.sh",
+    "test": "npm run test:api && npm run test:frontend",
+    "test:api": "cd nanomed-NODEJS-API-v2 && npm test",
+    "test:frontend": "cd nanomed-v4-react-node-nextjs && npm test",
+    "build": "npm run build:api && npm run build:frontend",
+    "build:api": "cd nanomed-NODEJS-API-v2 && npm run build",
+    "build:frontend": "cd nanomed-v4-react-node-nextjs && npm run build",
+    "install:all": "npm install && cd nanomed-NODEJS-API-v2 && npm install && cd ../nanomed-v4-react-node-nextjs && npm install",
+    "clean": "docker-compose down -v && docker system prune -f",
+    "setup": "./start.sh"
+  },
+  "keywords": [
+    "medical",
+    "healthcare",
+    "docker",
+    "nodejs",
+    "nextjs",
+    "react",
+    "sqlserver"
+  ],
+  "author": "Nanomed Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/nanomed-docker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tu-usuario/nanomed-docker/issues"
+  },
+  "homepage": "https://github.com/tu-usuario/nanomed-docker#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

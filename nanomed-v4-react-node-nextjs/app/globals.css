@@ -1,0 +1,256 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 0 0% 0%; /* #000000 */
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 0 0% 0%; /* #000000 */
+    --popover: 0 0% 100%; /* #ffffff */
+    --popover-foreground: 0 0% 0%; /* #000000 */
+    --primary: 196 78% 64%; /* #59c3ed */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+    --secondary: 188 25% 96%; /* #f0f6f7 */
+    --secondary-foreground: 0 0% 0%; /* #000000 */
+    --muted: 188 25% 96%; /* #f0f6f7 */
+    --muted-foreground: 0 0% 48%; /* #7b7b7b */
+    --accent: 188 100% 85%; /* #aef4ff */
+    --accent-foreground: 0 0% 0%; /* #000000 */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 188 25% 96%; /* #f0f6f7 */
+    --input: 0 0% 100%; /* #ffffff */
+    --ring: 196 78% 64%; /* #59c3ed */
+    --radius: 0.5rem;
+
+    /* Variables específicas para el dashboard */
+    --sidebar-background: 240 5% 96%; /* #f5f5f6 - gris muy claro */
+    --sidebar-foreground: 0 0% 0%; /* #000000 */
+    --sidebar-border: 188 25% 96%; /* #f0f6f7 */
+    --sidebar-muted: 240 5% 98%; /* #fafafa - más claro que el fondo */
+    --sidebar-muted-foreground: 0 0% 48%; /* #7b7b7b */
+    --sidebar-accent: 188 100% 85%; /* #aef4ff */
+    --sidebar-accent-foreground: 0 0% 0%; /* #000000 */
+    --sidebar-ring: 196 78% 64%; /* #59c3ed */
+    --main-background: 188 25% 96%; /* #f0f6f7 */
+  }
+
+  .dark {
+    --background: 225 39% 11%; /* #111726 */
+    --foreground: 0 0% 100%; /* #ffffff */
+    --card: 225 39% 15%; /* Un poco más claro que el fondo */
+    --card-foreground: 0 0% 100%; /* #ffffff */
+    --popover: 225 39% 15%;
+    --popover-foreground: 0 0% 100%; /* #ffffff */
+    --primary: 196 78% 64%; /* #59c3ed */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+    --secondary: 225 39% 20%; /* Más claro que el fondo */
+    --secondary-foreground: 0 0% 100%; /* #ffffff */
+    --muted: 225 39% 20%;
+    --muted-foreground: 0 0% 70%; /* Gris claro para texto secundario */
+    --accent: 204 58% 55%; /* #479cd0 */
+    --accent-foreground: 0 0% 100%; /* #ffffff */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 225 39% 20%;
+    --input: 225 39% 15%;
+    --ring: 196 78% 64%; /* #59c3ed */
+
+    /* Variables específicas para el dashboard en tema oscuro */
+    --sidebar-background: 225 39% 9%; /* #0d1117 - más oscuro */
+    --sidebar-foreground: 0 0% 100%; /* #ffffff */
+    --sidebar-border: 225 39% 20%;
+    --sidebar-muted: 225 39% 15%; /* Más claro que el fondo */
+    --sidebar-muted-foreground: 0 0% 70%;
+    --sidebar-accent: 204 58% 55%; /* #479cd0 */
+    --sidebar-accent-foreground: 0 0% 100%; /* #ffffff */
+    --sidebar-ring: 196 78% 64%; /* #59c3ed */
+    --main-background: 225 39% 13%; /* Ligeramente más claro que el sidebar */
+  }
+
+  .high-contrast {
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 0 0% 0%; /* #000000 */
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 0 0% 0%; /* #000000 */
+    --popover: 0 0% 100%; /* #ffffff */
+    --popover-foreground: 0 0% 0%; /* #000000 */
+    --primary: 192 89% 36%; /* #0797b3 - más oscuro para mejor contraste */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 0%; /* #000000 */
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 0%; /* #000000 - máximo contraste */
+    --accent: 192 89% 36%; /* #0797b3 */
+    --accent-foreground: 0 0% 100%; /* #ffffff */
+    --destructive: 0 100% 25%; /* Más oscuro para mejor contraste */
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 0%; /* #000000 - bordes negros para máximo contraste */
+    --input: 0 0% 100%; /* #ffffff */
+    --ring: 0 0% 0%; /* #000000 */
+
+    /* Variables específicas para el dashboard en alto contraste */
+    --sidebar-background: 0 0% 95%; /* #f2f2f2 - gris muy claro */
+    --sidebar-foreground: 0 0% 0%; /* #000000 */
+    --sidebar-border: 0 0% 0%; /* #000000 */
+    --sidebar-muted: 0 0% 98%; /* #fafafa - más claro */
+    --sidebar-muted-foreground: 0 0% 0%; /* #000000 */
+    --sidebar-accent: 192 89% 36%; /* #0797b3 */
+    --sidebar-accent-foreground: 0 0% 100%; /* #ffffff */
+    --sidebar-ring: 0 0% 0%; /* #000000 */
+    --main-background: 0 0% 100%; /* #ffffff */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Estilos específicos para la página principal */
+.home-theme {
+  /* Forzar variables CSS para la página principal */
+  --background: 0 0% 100% !important; /* #ffffff */
+  --foreground: 0 0% 0% !important; /* #000000 */
+  --card: 0 0% 100% !important; /* #ffffff */
+  --card-foreground: 0 0% 0% !important; /* #000000 */
+  --popover: 0 0% 100% !important; /* #ffffff */
+  --popover-foreground: 0 0% 0% !important; /* #000000 */
+  --primary: 196 78% 64% !important; /* #59c3ed */
+  --primary-foreground: 0 0% 100% !important; /* #ffffff */
+  --secondary: 188 25% 96% !important; /* #f0f6f7 */
+  --secondary-foreground: 0 0% 0% !important; /* #000000 */
+  --muted: 188 25% 96% !important; /* #f0f6f7 */
+  --muted-foreground: 0 0% 48% !important; /* #7b7b7b */
+  --accent: 188 100% 85% !important; /* #aef4ff */
+  --accent-foreground: 0 0% 0% !important; /* #000000 */
+  --destructive: 0 84.2% 60.2% !important;
+  --destructive-foreground: 0 0% 100% !important;
+  --border: 188 25% 96% !important; /* #f0f6f7 */
+  --input: 0 0% 100% !important; /* #ffffff */
+  --ring: 196 78% 64% !important; /* #59c3ed */
+}
+
+/* Estilos específicos para componentes de la página principal */
+.home-theme .bg-cyan-500 {
+  background-color: #59c3ed !important;
+}
+
+.home-theme .text-cyan-500 {
+  color: #59c3ed !important;
+}
+
+.home-theme .border-cyan-500 {
+  border-color: #59c3ed !important;
+}
+
+.home-theme .hover\:bg-cyan-600:hover {
+  background-color: #479cd0 !important;
+}
+
+.home-theme .hover\:bg-cyan-50:hover {
+  background-color: #aef4ff !important;
+}
+
+.home-theme .text-cyan-400 {
+  color: #59c3ed !important;
+}
+
+.home-theme .bg-gray-50 {
+  background-color: #f0f6f7 !important;
+}
+
+.home-theme .bg-white {
+  background-color: #ffffff !important;
+}
+
+.home-theme .text-gray-600 {
+  color: #7b7b7b !important;
+}
+
+.home-theme .text-gray-700 {
+  color: #000000 !important;
+}
+
+.home-theme .text-gray-800 {
+  color: #000000 !important;
+}
+
+.home-theme .text-gray-900 {
+  color: #000000 !important;
+}
+
+.home-theme .bg-\[\#222222\] {
+  background-color: #111726 !important;
+}
+
+.home-theme .text-white {
+  color: #ffffff !important;
+}
+
+.home-theme .text-gray-300 {
+  color: #7b7b7b !important;
+}
+
+.home-theme .text-gray-400 {
+  color: #7b7b7b !important;
+}
+
+.home-theme .hover\:text-white:hover {
+  color: #ffffff !important;
+}
+
+.home-theme .border-gray-700 {
+  border-color: #7b7b7b !important;
+}
+
+.home-theme .bg-green-500 {
+  background-color: #59c3ed !important;
+}
+
+.home-theme .hover\:bg-green-600:hover {
+  background-color: #479cd0 !important;
+}
+
+.container {
+  @apply mx-auto px-4 max-w-7xl;
+}
+
+/* Clases utilitarias para el dashboard */
+.sidebar-bg {
+  background-color: hsl(var(--sidebar-background));
+}
+
+.sidebar-text {
+  color: hsl(var(--sidebar-foreground));
+}
+
+.sidebar-border {
+  border-color: hsl(var(--sidebar-border));
+}
+
+.sidebar-muted {
+  background-color: hsl(var(--sidebar-muted));
+}
+
+.sidebar-muted-text {
+  color: hsl(var(--sidebar-muted-foreground));
+}
+
+.main-bg {
+  background-color: hsl(var(--main-background));
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-fade-in {
+  animation: fade-in 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}

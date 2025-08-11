@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Base de datos SQL Server local para desarrollo
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: nanomed-sqlserver-local
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./nanomed-NODEJS-API-v2/EstucturaBDD.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nanomed-network
+    restart: unless-stopped
+
+  # API Node.js
+  api:
+    build:
+      context: ./nanomed-NODEJS-API-v2
+      dockerfile: Dockerfile
+    container_name: nanomed-api
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - HOST=0.0.0.0
+      - CLIENT_URL=http://localhost:3000
+      # Variables de base de datos SQL Server local
+      - DB_SERVER=db
+      - DB_USER=sa
+      - DB_PASSWORD=YourStrong@Passw0rd
+      - DB_NAME=nanomed
+      - DB_PORT=1433
+      # Variables de JWT
+      - JWT_SECRET=your_jwt_secret_here
+      - JWT_EXPIRATION=1h
+      - JWT_REFRESH_EXPIRATION=7d
+      # Variables de email (ajusta según tu configuración)
+      # - EMAIL_SERVICE=gmail
+      # - EMAIL_USER=your_email@gmail.com
+      # - EMAIL_PASSWORD=your_app_password
+      # - EMAIL_FROM=Nanomed <no-reply@nanomed.com>
+      # Variables de Mailgun (opcional)
+      # - MAILGUN_API_KEY=your_mailgun_api_key
+      # - MAILGUN_DOMAIN=your_mailgun_domain
+      # - MAILGUN_FROM=Nanomed <noreply@nanomed.cl>
+      # Rate limiting
+      - RATE_LIMITING_ENABLED=false
+    volumes:
+      - ./nanomed-NODEJS-API-v2:/app
+      - /app/node_modules
+    networks:
+      - nanomed-network
+    depends_on:
+      - db
+      - frontend
+    restart: unless-stopped
+
+  # Frontend Next.js
+  frontend:
+    build:
+      context: ./nanomed-v4-react-node-nextjs
+      dockerfile: Dockerfile
+    container_name: nanomed-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_CLIENT_URL=http://localhost:3000
+    volumes:
+      - ./nanomed-v4-react-node-nextjs:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - nanomed-network
+    restart: unless-stopped
+
+networks:
+  nanomed-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:

@@ -1,0 +1,23 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY package-postgresql.json package.json
+COPY yarn.lock ./
+
+# Instalar dependencias
+RUN yarn install --frozen-lockfile
+
+# Copiar código fuente
+COPY . .
+
+# Copiar configuración de PostgreSQL
+COPY config-postgresql.js config.js
+COPY src/db/postgresql.js src/db/postgresql.js
+
+# Exponer puerto
+EXPOSE 8080
+
+# Comando para ejecutar la aplicación
+CMD ["yarn", "start"]
