@@ -202,3 +202,4 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 - **Email**: soporte@nanomed.cl
 - **Documentación**: Ver archivos README en cada subdirectorio
 - **Issues**: Crear un issue en GitHub para reportar bugs o solicitar features
+# Test Docker Hub credentials
