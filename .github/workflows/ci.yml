@@ -28,22 +28,23 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Check lock files
+    - name: Check project structure
       run: |
-        echo "Checking for lock files..."
-        ls -la nanomed-NODEJS-API-v2/package*.json || echo "No package.json in backend"
-        ls -la nanomed-v4-react-node-nextjs/package*.json || echo "No package.json in frontend"
-        ls -la nanomed-NODEJS-API-v2/package-lock.json || echo "No package-lock.json in backend"
-        ls -la nanomed-v4-react-node-nextjs/yarn.lock || echo "No yarn.lock in frontend"
+        echo "Checking project structure..."
+        echo "Backend files:"
+        ls -la nanomed-NODEJS-API-v2/package*.json
+        echo "Frontend files:"
+        ls -la nanomed-v4-react-node-nextjs/package*.json
+        echo "Lock files:"
+        ls -la nanomed-NODEJS-API-v2/package-lock.json
+        ls -la nanomed-v4-react-node-nextjs/yarn.lock
     
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'yarn'
-        cache-dependency-path: |
-          nanomed-NODEJS-API-v2/package-lock.json
-          nanomed-v4-react-node-nextjs/yarn.lock
+        cache: 'npm'
+        cache-dependency-path: nanomed-NODEJS-API-v2/package-lock.json
     
     - name: Install dependencies (Backend)
       run: |
@@ -52,6 +53,13 @@ jobs:
       env:
         NODE_ENV: development
     
+    - name: Setup Yarn for Frontend
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'yarn'
+        cache-dependency-path: nanomed-v4-react-node-nextjs/yarn.lock
+
     - name: Install dependencies (Frontend)
       run: |
         cd nanomed-v4-react-node-nextjs
