@@ -119,8 +119,8 @@ jobs:
         context: ./nanomed-NODEJS-API-v2
         push: true
         tags: |
-          ghcr.io/soportenanomed/nanomed-api:latest
-          ghcr.io/soportenanomed/nanomed-api:${{ github.sha }}
+          ghcr.io/${{ github.actor }}/nanomed-api:latest
+          ghcr.io/${{ github.actor }}/nanomed-api:${{ github.sha }}
     
     - name: Build and push Frontend image
       uses: docker/build-push-action@v4
@@ -128,8 +128,8 @@ jobs:
         context: ./nanomed-v4-react-node-nextjs
         push: true
         tags: |
-          ghcr.io/soportenanomed/nanomed-frontend:latest
-          ghcr.io/soportenanomed/nanomed-frontend:${{ github.sha }}
+          ghcr.io/${{ github.actor }}/nanomed-frontend:latest
+          ghcr.io/${{ github.actor }}/nanomed-frontend:${{ github.sha }}
 
   deploy:
     needs: test
